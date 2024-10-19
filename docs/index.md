@@ -77,6 +77,8 @@ init_auth(user_roles, tenant_id, client_id)
 st.write(f"Welcome, {st.session_state.username}")
 ```
 
+The user sign information is stored in `st.session_state.auth_data`, the user name is stored in `st.session_state.username`, and the user roles are stored in `st.session_state.roles`.
+
 Details check [example folder](https://github.com/xiepei1/streamlit-msal-2/tree/main/docs/example)
 
 ## Known Issues and Limitations

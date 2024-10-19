@@ -35,6 +35,8 @@ init_auth(user_roles, tenant_id, client_id)
 st.write(f"Welcome, {st.session_state.username}")
 ```
 
+The user sign information is stored in `st.session_state.auth_data`, the user name is stored in `st.session_state.username`, and the user roles are stored in `st.session_state.roles`.
+
 ## How it works?
 
 * this package is using streamlit-msal in the background for the authentication.
@@ -44,4 +46,4 @@ st.write(f"Welcome, {st.session_state.username}")
     * by assigning user roles in App registration enterprise configuration, the authentication
 process can automatically check the signed in user's App roles, if it fulfills the predefined user roles, users can go further in streamlit
 
-More to see documentation site.
+More to see [documentation site](https://xiepei1.github.io/streamlit-msal-2/).
