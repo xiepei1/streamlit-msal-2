@@ -1,0 +1,1 @@
+streamlit-msal-2

@@ -1,0 +1,9 @@
+[theme]
+base = "light"
+font = "sans serif"
+
+[server]
+port = 8501
+
+[browser]
+gatherUsageStats = false

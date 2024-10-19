@@ -1,0 +1,23 @@
+[project]
+name = "streamlit-msal-2"
+version = "0.0.1"
+description = "Streamlit component for AzureAD ConfidentialClientApplication using Microsoft Authentication Library (MSAL), this is further developed based on original straemlit-msal by WilianZilv"
+authors = [
+    { name = "xiepei1", email = "cn_xiepei@163.com" }
+]
+dependencies = [
+    "streamlit",
+    "streamlit-msal",
+]
+readme = "README.md"
+requires-python = ">= 3.10"
+
+[project.urls]
+Repository = "https://github.com/xiepei1/streamlit-msal-2"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
