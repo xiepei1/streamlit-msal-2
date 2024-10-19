@@ -99,7 +99,7 @@ jobs:
     name: lint all code
     needs: [blacken]
     if: github.ref == 'refs/heads/main'
-    runs-on: ["self-hosted", "Linux", "bpc"]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
