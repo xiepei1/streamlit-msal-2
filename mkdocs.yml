@@ -1,0 +1,149 @@
+site_name: streamlit-msal-2
+site_description: streamlit-msal-2
+# site_url:
+repo_url: https://github.com/xiepei1/streamlit-msal-2
+repo_name: "streamlit-msal-2"
+site_author: xiepei1
+copyright: Copyright (C) 2024 xiepei1
+
+site_dir: .site
+
+nav:
+  - Home:
+    - Intro: index.md
+  - API Reference: reference/streamlit_msal_2/
+
+theme:
+  name: material
+  custom_dir: docs/assets/overrides
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - header.autohide
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.footer
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+    annotation: material/arrow-right-circle
+    tag:
+      html: fontawesome/brands/html5
+      js: fontawesome/brands/js
+      css: fontawesome/brands/css3
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      toggle:
+        icon: material/eye
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      toggle:
+        icon: material/eye-outline
+        name: Switch to light mode
+
+extra_css:
+  - assets/stylesheets/style.css
+
+extra_javascript:
+  - https://unpkg.com/tablesort/dist/tablesort.min.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js
+extra:
+  generator: true
+  tags:
+    HTML5: html
+    JavaScript: js
+    CSS: css
+  version:
+    provider: mike
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.critic:
+      mode: view
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      use_pygments: true
+      auto_title: true
+      linenums: true
+      linenums_style: pymdownx-inline
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.keys
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - glightbox
+  - gen-files:
+      scripts:
+        - docs/utils/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - minify:
+      minify_html: true
+      htmlmin_opts:
+        remove_comments: true
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          allow_inspection: false
+          rendering:
+            show_source: true
+          options:
+            show_signature: true
+            show_signature_annotations: false
+            show_root_full_path: false
+            show_object_full_path: false
+            line_length: 80
+            docstring_options:
+              ignore_init_summary: false
+              trim_doctest_flags: false
+  - search
+  - git-authors
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+      enable_creation_date: true
+      timezone: Asia/Shanghai
+      type: datetime
+      exclude:
+        - index.md

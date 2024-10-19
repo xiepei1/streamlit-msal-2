@@ -9,49 +9,75 @@ on:
 
 jobs:
   build:
-    name: build the wheel, publish to pypi and make releases
+    name: Build distribution 📦
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-    permissions:
-      id-token: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
+    - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
-
+        python-version: "3.12"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install --upgrade build
+    - name: Build a binary wheel and a source tarball
+      run: python3 -m build
+    - name: Upload artifacts to Runner
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist
 
-    - name: Build package
-      run: python -m build
+  publish-to-pypi:
+    name: Publish Python 🐍 distribution 📦 to PyPI
+    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/streamlit-msal-2  # Replace <package-name> with your PyPI project name
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
 
-    - name: Publish package distributions to PyPI
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist
+    - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+  github-release:
+    name: Sign the Python 🐍 distribution 📦 with Sigstore and upload them to GitHub Release
+    needs: [publish-to-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
 
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/*.whl
-        asset_name: streamlit-msal-2-${{ github.ref }}.whl
-        asset_content_type: application/zip
+        name: dist
+        path: dist
+    - name: Sign the dists with Sigstore
+      uses: sigstore/gh-action-sigstore-python@v2.1.1
+      with:
+        inputs: |
+          ./dist/*.tar.gz
+          ./dist/*.whl
+
+    - name: Get version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "dist/*.whl"
+        tag: ${{ steps.get_version.outputs.VERSION }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        generateReleaseNotes: true

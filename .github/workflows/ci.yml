@@ -1,0 +1,171 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+defaults:
+  run:
+    shell: bash -e {0}
+
+concurrency:
+  group: ${{ github.job }}-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    name: Make documentations
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Checkout lfs object
+        uses: nschloe/action-cached-lfs-checkout@v1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: pip install
+        run: pip install -r requirements-docs.txt
+
+      - name: Make the markdowns
+        run: python docs/utils/gen_ref_pages.py
+
+      - name: Build the book
+        run: mkdocs build
+
+      - name: GitHub Pages action
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./.site
+
+  blacken:
+    name: blacken format code
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Check files using the black formatter
+        uses: datadog/action-py-black-formatter@v2.5
+        id: action_black
+        with:
+          additional_args: --line-length 79 --verbose --extend-exclude .ipynb --exclude ^/docs/
+
+      - name: Get current time
+        id: date
+        run: |
+          now_date=$(date +'%Y-%h-%d-%H-%M-%S')
+          echo "DATE=$now_date" >> "$GITHUB_ENV"
+
+      - name: Create Pull Request
+        if: steps.action_black.outputs.is_formatted == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Format Python code with psf/black push"
+          commit-message: ":art: Format Python code with psf/black"
+          body: |
+            There appear to be some python formatting errors in ${{ github.sha }}. This pull request
+            uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
+          base: ${{ github.head_ref }} # Creates pull request onto pull request or commit branch
+          branch: actions/black_${{ env.DATE }}
+          labels: |
+            automated pr
+            black
+            styling
+          add-paths: |
+            src/**.py
+            src/
+            .
+
+  pylint:
+    name: lint all code
+    needs: [blacken]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ["self-hosted", "Linux", "bpc"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup pylint
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pylint
+
+      - name: Lint files, scoring
+        id: pylint
+        run: |
+          pylint_score=$(pylint --rcfile=.pylintrc $(git ls-files 'src/*.py') --fail-under=7 --reports=n --score=y | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')
+          # echo "::set-output name=pylint_score::$pylint_score"
+          echo "PYLINT_SCORE=$pylint_score" >> "$GITHUB_ENV"
+
+      - name: Generate Badge
+        id: gen_badge
+        uses: emibcn/badge-action@v2.0.3
+        with:
+          label: "pylint"
+          status: "${{ env.PYLINT_SCORE }}/10"
+          color: "blue"
+          path: "docs/badge/quality.svg"
+
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v20
+        id: verify-changed-files
+        with:
+          files: |
+            docs/badge/quality.svg
+            *.svg
+
+      - name: Commit files
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          echo "Changed files: ${{ steps.verify-changed-files.outputs.changed_files }}"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/badge/quality.svg
+          git commit -m "Updated quality.svg"
+
+      - name: Get current time
+        id: date
+        run: |
+          now_date=$(date +'%Y-%h-%d-%H-%M-%S')
+          echo "DATE=$now_date" >> "$GITHUB_ENV"
+
+      - name: Create Pull Request
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Add code quality badge"
+          commit-message: ":art: add code quality badge"
+          body: |
+            A new code quality badage has been generated.
+          base: ${{ github.head_ref }} # Creates pull request onto pull request or commit branch
+          branch: actions/quality_${{ env.DATE }}
+          labels: |
+            automated pr
+            styling
+            badge
