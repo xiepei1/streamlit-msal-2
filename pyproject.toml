@@ -24,7 +24,7 @@ classifiers = [
 Repository = "https://github.com/xiepei1/streamlit-msal-2"
 Homepage = "https://github.com/xiepei1/streamlit-msal-2"
 Issues = "https://github.com/xiepei1/streamlit-msal-2/issues"
-Documentation = "https://github.com/xiepei1/streamlit-msal-2"
+Documentation = "https://xiepei1.github.io/streamlit-msal-2/"
 
 [build-system]
 requires = ["setuptools"]
