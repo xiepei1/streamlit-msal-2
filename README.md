@@ -4,6 +4,12 @@ Yet another msal Single-Sign-On module of streamlit applications also for Confid
 
 ![ci](https://github.com/xiepei1/streamlit-msal-2/actions/workflows/ci.yml/badge.svg)
 ![cd](https://github.com/xiepei1/streamlit-msal-2/actions/workflows/cd.yml/badge.svg)
+![pylint](/docs/badge/quality.svg)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/streamlit-msal-2)](https://pypi.org/project/streamlit-msal-2/)
+[![PyPI](https://img.shields.io/pypi/v/streamlit-msal-2)](https://pypi.org/project/streamlit-msal-2/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/streamlit-msal-2)](https://pypi.org/project/streamlit-msal-2/)
+[![Release](https://img.shields.io/github/v/release/xiepei1/streamlit-msal-2)](https://github.com/xiepei1/streamlit-msal-2/releases)
+[![GitHub](https://img.shields.io/github/license/xiepei1/streamlit-msal-2)](https://github.com/xiepei1/streamlit-msal-2/blob/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 This is a workaround of streamlit to use msal authentication process in an enterprise environment for ConfidentialClientApplication.
