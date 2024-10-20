@@ -1,6 +1,6 @@
 [project]
 name = "streamlit-msal-2"
-version = "0.1.0"
+version = "0.2.1"
 description = "yet another msal Single-Sign-On module of streamlit applications also for ConfidentialClientApplication by checking required App roles of signed-in users in the enterprise setup, and support obo flow"
 authors = [
     { name = "xiepei1", email = "cn_xiepei@163.com" }
